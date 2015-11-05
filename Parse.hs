@@ -1,10 +1,4 @@
-module Parse (
-parse_regex,
-Regex,
-Term,
-Factor,
-Base
-) where
+module Parse where
 data Regex = Or Term Regex | Regex Term deriving(Eq)
 
 type Term = [Factor]
@@ -22,8 +16,8 @@ instance Show Factor where
     show (Starred base) = show "(kleene-star " ++ show base ++ " )"
 
 instance Show Base where
-    show (Base char) = show char
-    show (Backslash char) = "\\" ++ show char
+    show (Base char) = [char]
+    show (Backslash char) = "\\" ++ [char]
     show (Parenthesized regex) = "( " ++ show regex ++ " )"
         
 eat :: String -> Char -> String
