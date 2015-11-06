@@ -51,9 +51,10 @@ convert_factor factor ending_node =
 
 kleene_star :: Base -> NFA -> NFA
 kleene_star base ending_node =
-    let penultimate_node = Node (Map.singleton Epsilon [ending_node]) False in
+    let penultimate_node = Node (Map.fromList [(Epsilon,
+    [ending_node, (convert_base base penultimate_node)])]) False in
         let base_node = convert_base base penultimate_node in
-            Node (Map.singleton Epsilon [base_node]) False
+            Node (Map.fromList [(Epsilon, [base_node,ending_node])]) False
         
 
 convert_regex :: Regex -> NFA -> NFA
@@ -72,16 +73,16 @@ convert_base base ending_node =
 convert_literal :: Transition -> NFA -> NFA
 convert_literal literal ending_node = 
     case literal of
-        Escaped char -> convert_escaped_character char
-        Transition char -> convert_character char
+        Escaped char -> convert_escaped_character char ending_node
+        Transition char -> convert_character char ending_node
 
-convert_character :: Char -> NFA
-convert_character char =
-    let ending_node = Node (Map.empty) False in
+convert_character :: Char -> NFA -> NFA
+convert_character char ending_node =
+    --let ending_node = Node (Map.empty) False in
      Node (Map.singleton (Transition char) [ending_node]) True
 
-convert_escaped_character :: Char -> NFA
-convert_escaped_character char = 
-    let ending_node = Node (Map.empty) False in
+convert_escaped_character :: Char -> NFA -> NFA
+convert_escaped_character char ending_node = 
+    --let ending_node = Node (Map.empty) False in
         let penultimate_node = Node (Map.singleton (Transition char) [ending_node]) True in
             Node (Map.singleton (Transition '\\') [penultimate_node]) True 
