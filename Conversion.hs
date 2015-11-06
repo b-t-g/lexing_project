@@ -5,6 +5,11 @@ import qualified Data.Map.Strict as Map
 --The empty string is not a valid character hence the necessity of the epsilon
 data Transition = Transition Char | Epsilon | Escaped Char deriving (Ord, Eq)
 
+instance Show Transition where
+    show (Transition char) = show char
+    show (Epsilon) = "Epsilon"
+    show (Escaped char) = '\\':(show char)
+
 {-
 An NFA is a map from characters to a list of NFA's and a boolean which
 states whether the node is an ending state
@@ -13,13 +18,14 @@ states whether the node is an ending state
 data NFA = Node {
     transitions :: (Map.Map (Transition) ([NFA]))
   , final_state :: Bool
-} | Nil deriving (Ord, Eq)
+} deriving (Ord, Eq)
+
 
 convert :: Regex -> NFA
 convert regex = 
     case regex of
-        Or (term) (regex) -> convert_or term regex Nil
-        Regex term -> convert_term term Nil
+        Or (term) (regex) -> convert_or term regex (Node (Map.empty) False)
+        Regex term -> convert_term term ((Node (Map.empty) False))
 
 convert_or :: Term -> Regex -> NFA -> NFA
 convert_or term regex ending_node=
@@ -34,8 +40,8 @@ convert_term :: Term -> NFA -> NFA
 convert_term term ending_node =
     case term of
         (x:xs) -> let factor_NFA = convert_factor (last term) ending_node in
-                                convert_term (init term) factor_NFA
-        [] -> Nil
+                      convert_term (init term) factor_NFA
+        [] -> ending_node
 
 convert_factor :: Factor -> NFA -> NFA
 convert_factor factor ending_node =
