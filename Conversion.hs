@@ -24,14 +24,15 @@ data NFA = Node {
 convert :: Regex -> NFA
 convert regex = 
     case regex of
-        Or (term) (regex) -> convert_or term regex (Node (Map.empty) False)
-        Regex term -> convert_term term ((Node (Map.empty) False))
+        Or (term) (regex) -> convert_or term regex (Node (Map.empty) True)
+        Regex term -> convert_term term ((Node (Map.empty) True))
 
 convert_or :: Term -> Regex -> NFA -> NFA
 convert_or term regex ending_node =
     let term_ending_node = Node (Map.singleton Epsilon [ending_node]) False in
         let term_initial_node = convert_term term term_ending_node in
-            let regex_ending_node = Node (Map.singleton Epsilon [ending_node]) False in
+            let regex_ending_node = Node (Map.singleton Epsilon [ending_node])
+                                          False in
                 let regex_initial_node = convert_regex regex regex_ending_node in
                     Node (Map.fromList [(Epsilon, [term_initial_node, regex_initial_node])]) False
                 
