@@ -52,7 +52,7 @@ convert_factor factor ending_node =
 kleene_star :: Base -> NFA -> NFA
 kleene_star base ending_node =
     let penultimate_node = Node (Map.fromList
-                                 [(Epsilon,[ending_node,(convert_base base penultimate_node)])])
+                                     [(Epsilon,[ending_node,(convert_base base penultimate_node)])])
                            False in
         let base_node = convert_base base penultimate_node in
             Node (Map.fromList [(Epsilon, [base_node,ending_node])]) False
